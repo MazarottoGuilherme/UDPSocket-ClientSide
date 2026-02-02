@@ -5,6 +5,7 @@
 
 #include "net/net.h"
 #include "render/render.h"
+#include "login/login.h"
 
 float player_x = 100;
 float player_y = 100;
@@ -18,6 +19,8 @@ int main() {
     SDL_Event e;
 
     send_login();
+
+    EntryUser();
 
     while (running) {
 

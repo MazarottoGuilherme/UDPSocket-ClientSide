@@ -24,4 +24,6 @@ void send_login();
 void send_input(int dx, int dy);
 void receive_packets();
 void send_logout();
+
+
 #endif //UDPSOCKETCLIENT_NET_H

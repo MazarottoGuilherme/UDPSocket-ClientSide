@@ -24,3 +24,7 @@ Release/
 *~
 .idea/        # CLion, IntelliJ
 .vscode/      # VSCode
+
+UDPSocket-ClientSide/.vscode/
+
+RodarCmake.txt
