@@ -24,3 +24,5 @@ Release/
 *~
 .idea/        # CLion, IntelliJ
 .vscode/      # VSCode
+
+rodar.txt

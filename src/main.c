@@ -5,11 +5,20 @@
 
 #include "net/net.h"
 #include "render/render.h"
+#include "login/login.h"
 
 float player_x = 100;
 float player_y = 100;
 
 int main() {
+
+    char *username = EntryUser();
+
+    // gambiarra pra verificar o nome (funciona)
+    int tamanhoName = strlen(username);
+    if(tamanhoName < 1){
+        return -1;
+    }
 
     socket_init();
     initRenderer();
@@ -17,7 +26,7 @@ int main() {
     int running = 1;
     SDL_Event e;
 
-    send_login();
+    //send_login();
 
     while (running) {
 
