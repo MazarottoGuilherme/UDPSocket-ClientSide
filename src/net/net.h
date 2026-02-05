@@ -1,12 +1,6 @@
-//
-// Created by guilherme on 2/1/26.
-//
-
 #ifndef UDPSOCKETCLIENT_NET_H
 #define UDPSOCKETCLIENT_NET_H
 
-extern float net_player_x;
-extern float net_player_y;
 #define MAX_PLAYERS 1024
 
 typedef struct {

@@ -1,7 +1,3 @@
-//
-// Created by guilherme on 2/1/26.
-//
-
 #include "net.h"
 
 #include <errno.h>
@@ -17,9 +13,6 @@
 int sock;
 struct sockaddr_in server_addr;
 socklen_t addr_len;
-
-float net_player_x = 0.0;
-float net_player_y = 0.0;
 
 Player players[MAX_PLAYERS];
 
