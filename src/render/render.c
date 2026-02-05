@@ -1,16 +1,13 @@
-//
-// Created by guilherme on 2/1/26.
-//
+#include "../render/render.h"
 
-#include "render.h"
 SDL_Window* window;
 SDL_Renderer* renderer;
 
 int WINDOW_WIDTH = 800;
 int WINDOW_HEIGHT = 600;
 
-void initRenderer() {
-    window = SDL_CreateWindow("Hello, World!", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, WINDOW_WIDTH, WINDOW_HEIGHT, SDL_WINDOW_SHOWN);
+void initRenderer(char* title) {
+    window = SDL_CreateWindow(title, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, WINDOW_WIDTH, WINDOW_HEIGHT, SDL_WINDOW_SHOWN);
     if (window == NULL) {
         printf("Failed to create window: %s\n", SDL_GetError());
         exit(1);
@@ -23,10 +20,15 @@ void initRenderer() {
     }
 }
 
-SDL_Window* getWindow() {
+void destroyRenderer(void) {
+    SDL_DestroyRenderer(renderer);
+    SDL_DestroyWindow(window);
+}
+
+SDL_Window* getWindow(void) {
     return window;
 }
 
-SDL_Renderer* getRenderer() {
+SDL_Renderer* getRenderer(void) {
     return renderer;
 }

@@ -1,7 +1,3 @@
-//
-// Created by guilherme on 2/1/26.
-//
-
 #include "net.h"
 
 #include <errno.h>
@@ -20,9 +16,6 @@ int sock;
 struct sockaddr_in server_addr;
 socklen_t addr_len;
 
-float net_player_x = 0.0;
-float net_player_y = 0.0;
-
 Player players[MAX_PLAYERS];
 
 int user_id = 0;
@@ -40,7 +33,7 @@ void socket_init() {
 
 
 // enviar os dados do long para o server, espera um retorno com ID
-int send_login(char *email, char *password) {
+int send_login(char *email, char *password, ) {
     memset(&server_addr, 0, sizeof(server_addr));
     server_addr.sin_family = AF_INET;
     server_addr.sin_port = htons(porta);
@@ -58,12 +51,17 @@ int send_login(char *email, char *password) {
         return; // retorna nada
     }
     bufferID[response] = '\0';
-    int user_id = atoi(bufferID);
-    if(user_id = 0){
-        return; // retorna nada
-    }else if(user_id < 0){
-        return; // retorna nada
-    }
+    char *token = strtok(bufferID, "|");
+    if (!token) return -1;
+
+    int id_user = atoi(token);
+    if (id_user <= 0) return -1;
+
+    token = strtok(NULL, "|");
+    if (!token) return -1;
+    strncpy(username, token, sizeof(user->username) - 1);
+    user->username[sizeof(user->username) - 1] = '\0';
+    user->id = id_user;
     close(sock);
     return user_id; // retorna um id
 }
