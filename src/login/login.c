@@ -1,7 +1,6 @@
 /*
     Create by Kaua 02/02/2026
 */
-
 #include "login.h"
 
 SDL_Window *windowLogin = NULL;
@@ -70,7 +69,7 @@ void drawUI(TTF_Font *font, const char *email, const char *password)
     SDL_RenderPresent(renderLogin);
 }
 
-char *EntryUser(Usuario *user)
+char *EntryUser(Usuario *usuario)
 {
     SDL_Init(SDL_INIT_VIDEO);
     TTF_Init();
@@ -112,8 +111,12 @@ char *EntryUser(Usuario *user)
                 else if (insideRect(e.button.x, e.button.y, passBox))
                     active = 1;
                 else if (insideRect(e.button.x, e.button.y, buttonEnter)){
-                    int resultado = SearchID(email, password, user);
-                    if (resultado > 0) {running = 0; } else if (resultado == 0) {
+                    int resultado = send_login(email, password);
+                    if (resultado > 0){
+                        usuario->id = resultado;
+                        running = 0;
+                    }
+                    else if (resultado == 0) {
                         printf("Erro: Email ou senha incorretos.\n");
                     } else {
                         printf("Erro de validação ou banco: Codigo %d\n", resultado);

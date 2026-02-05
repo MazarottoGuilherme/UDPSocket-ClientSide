@@ -6,18 +6,18 @@
 #include "net/net.h"
 #include "render/render.h"
 #include "login/login.h"
-#include "db/login/loginUser.h"
+#include "usuario/usuario.h"
 
 float player_x = 100;
 float player_y = 100;
 
 // usuario do LoginUser (as informações dele)
-Usuario usuarioLogado;
+Usuario dadosUsuario;
 
 int main() {
-
-    char *username = EntryUser(&usuarioLogado);
-
+    // vai ter o id do usuario
+    Usuario dadosUsuario;
+    char *username = EntryUser(&dadosUsuario);
 
     // gambiarra pra verificar o nome (funciona)
     int tamanhoName = strlen(username);

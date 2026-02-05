@@ -14,6 +14,8 @@
 #include <netinet/in.h>
 #include <sys/socket.h>
 
+
+int porta = 8080;
 int sock;
 struct sockaddr_in server_addr;
 socklen_t addr_len;
@@ -36,15 +38,34 @@ void socket_init() {
     addr_len = sizeof(server_addr);
 }
 
-void send_login() {
-    PacketLogin pkt;
-    memset(&pkt, 0, sizeof(pkt));
 
-    pkt.type = PKT_LOGIN;
-    strncpy(pkt.username, "guilherme", 15);
-
-    sendto(sock, &pkt, sizeof(pkt), 0,
-           (struct sockaddr*)&server_addr, addr_len);
+// enviar os dados do long para o server, espera um retorno com ID
+int send_login(char *email, char *password) {
+    memset(&server_addr, 0, sizeof(server_addr));
+    server_addr.sin_family = AF_INET;
+    server_addr.sin_port = htons(porta);
+    inet_pton(AF_INET, "127.0.0.1", &server_addr.sin_addr);
+    char msg[256];
+    snprintf(msg, sizeof(msg), "LOGIN|01|%s|%s", email, password);
+    if (sendto(sock, msg, strlen(msg), 0,(struct sockaddr*)&server_addr, addr_len) < 0) {
+        perror("sendto");
+        return; // retorna nada
+    }
+    char bufferID[256];
+    ssize_t response = recvfrom(sock, bufferID, sizeof(bufferID) - 1, 0,
+                         (struct sockaddr*)&server_addr, &addr_len);
+    if (response < 0) {perror("recvfrom");
+        return; // retorna nada
+    }
+    bufferID[response] = '\0';
+    int user_id = atoi(bufferID);
+    if(user_id = 0){
+        return; // retorna nada
+    }else if(user_id < 0){
+        return; // retorna nada
+    }
+    close(sock);
+    return user_id; // retorna um id
 }
 
 void send_input(int dx, int dy) {

@@ -20,7 +20,7 @@ extern Player players[MAX_PLAYERS];
 extern int user_id;
 
 void socket_init();
-void send_login();
+int send_login(char *email, char *password);
 void send_input(int dx, int dy);
 void receive_packets();
 void send_logout();
