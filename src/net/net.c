@@ -18,7 +18,7 @@ socklen_t addr_len;
 
 Player players[MAX_PLAYERS];
 
-int user_id = 0;
+int porta = 8888;
 
 void socket_init() {
     sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
@@ -31,9 +31,9 @@ void socket_init() {
     addr_len = sizeof(server_addr);
 }
 
-
 // enviar os dados do long para o server, espera um retorno com ID
-int send_login(char *email, char *password, ) {
+int send_login(char *email, char *password) {
+
     memset(&server_addr, 0, sizeof(server_addr));
     server_addr.sin_family = AF_INET;
     server_addr.sin_port = htons(porta);
@@ -51,20 +51,22 @@ int send_login(char *email, char *password, ) {
         return; // retorna nada
     }
     bufferID[response] = '\0';
-    char *token = strtok(bufferID, "|");
-    if (!token) return -1;
-
-    int id_user = atoi(token);
-    if (id_user <= 0) return -1;
-
-    token = strtok(NULL, "|");
-    if (!token) return -1;
-    strncpy(username, token, sizeof(user->username) - 1);
-    user->username[sizeof(user->username) - 1] = '\0';
+    int id_user;
+    char username[100];
+    if (sscanf(bufferID, "%d|%99s", &id_user, username) != 2) {
+        fprintf(stderr, "Erro ao ler resposta do servidor\n");
+        return -1;
+    }
+    if (id_user <= 0) {
+        return -1;
+    }
+    Usuario user;
     user->id = id_user;
+    user->name = username;
     close(sock);
     return user_id; // retorna um id
 }
+
 
 void send_input(int dx, int dy) {
     PacketInput pkt;
@@ -140,7 +142,7 @@ void receive_packets() {
 
             for (int i = 0; i < MAX_PLAYERS; i++) {
                 if (players[i].active && players[i].id == pkt->id) {
-                    players[i].active = 0;  // remove da lista
+                    players[i].active = 0;
                     break;
                 }
             }

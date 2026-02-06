@@ -1,6 +1,4 @@
 #include "game.h"
-#include "../../net/net.h"
-#include "../../render/render_objects.h"
 
 
 void game_init(void) {
