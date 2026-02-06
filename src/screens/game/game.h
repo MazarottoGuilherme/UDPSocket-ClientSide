@@ -1,5 +1,8 @@
 #ifndef UDPSOCKETCLIENT_GAME_H
 #define UDPSOCKETCLIENT_GAME_H
+
+#include "../../net/net.h"
+#include "../../render/render_objects.h"
 #include <SDL_events.h>
 
 void game_init(void);

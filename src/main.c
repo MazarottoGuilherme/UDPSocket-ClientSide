@@ -8,16 +8,17 @@
 #include "engine/engine.h"
 #include "screens/screen.h"
 #include <unistd.h>
+
+
 float player_x = 100;
 float player_y = 100;
 
-int main() {
-    char cwd[512];
-    getcwd(cwd, sizeof(cwd));
-    printf("Working dir: %s\n", cwd);
 
-    engine_init();
-    change_screen(SCREEN_LOGIN);
+int main() {
+
+    socket_init();
+    initRenderer();
+
     int running = 1;
     SDL_Event e;
     while (running) {
