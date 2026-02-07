@@ -1,0 +1,4 @@
+#ifndef UDPSOCKETCLIENT_MAP_LOADER_H
+#define UDPSOCKETCLIENT_MAP_LOADER_H
+char* read_file(const char* path);
+#endif //UDPSOCKETCLIENT_MAP_LOADER_H

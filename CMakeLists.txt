@@ -7,6 +7,8 @@ find_package(PkgConfig REQUIRED)
 
 pkg_check_modules(SDL2 REQUIRED sdl2)
 pkg_check_modules(SDL2_TTF REQUIRED SDL2_ttf)
+pkg_check_modules(SDL2_IMAGE REQUIRED SDL2_image)
+pkg_check_modules(CJSON REQUIRED libcjson)
 
 add_executable(UDPSocketClient
         src/main.c
@@ -26,16 +28,25 @@ add_executable(UDPSocketClient
         src/game/game_state.h
         src/screens/game/game.c
         src/screens/game/game.h
+        src/render/tilemap.c
+        src/render/tilemap.h
+        src/map/map.c
+        src/map/map.h
+        src/map/map_loader.c
+        src/map/map_loader.h
 )
 
 target_include_directories(UDPSocketClient PRIVATE
         ${SDL2_INCLUDE_DIRS}
         ${SDL2_TTF_INCLUDE_DIRS}
+        ${CJSON_INCLUDE_DIRS}
 )
 
 target_link_libraries(UDPSocketClient PRIVATE
         ${SDL2_LIBRARIES}
         ${SDL2_TTF_LIBRARIES}
+        ${SDL2_IMAGE_LIBRARIES}
+        ${CJSON_LIBRARIES}
         m
 )
 add_compile_definitions(ASSETS_DIR="${CMAKE_SOURCE_DIR}/assets")

@@ -4,6 +4,7 @@
 
 #include "../protocol/protocol.h"
 #include <fcntl.h>
+#include <SDL_timer.h>
 #include <stdio.h>
 #include <string.h>
 #include <arpa/inet.h>
@@ -18,6 +19,9 @@ Player players[MAX_PLAYERS];
 
 int user_id = 0;
 
+static uint32_t last_ping_sent = 0;
+static uint32_t last_pong_received = 0;
+
 void socket_init() {
     sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
     fcntl(sock, F_SETFL, O_NONBLOCK);
@@ -27,6 +31,8 @@ void socket_init() {
     server_addr.sin_addr.s_addr = inet_addr("127.0.0.1");
 
     addr_len = sizeof(server_addr);
+
+    last_pong_received = SDL_GetTicks();
 }
 
 void send_login() {
@@ -36,8 +42,7 @@ void send_login() {
     pkt.type = PKT_LOGIN;
     strncpy(pkt.username, "guilherme", 15);
 
-    sendto(sock, &pkt, sizeof(pkt), 0,
-           (struct sockaddr*)&server_addr, addr_len);
+    net_send(&pkt, sizeof(pkt));
 }
 
 void send_input(int dx, int dy) {
@@ -46,8 +51,7 @@ void send_input(int dx, int dy) {
     pkt.dx = dx;
     pkt.dy = dy;
 
-    sendto(sock, &pkt, sizeof(pkt), 0,
-           (struct sockaddr*)&server_addr, addr_len);
+    net_send(&pkt, sizeof(pkt));
 }
 
 void send_logout() {
@@ -55,7 +59,19 @@ void send_logout() {
     pkt.type = PKT_LOGOUT;
     pkt.id = user_id;
 
-    sendto(sock, &pkt, sizeof(pkt), 0, (struct sockaddr*)&server_addr, addr_len);
+    net_send(&pkt, sizeof(pkt));
+}
+
+void send_ping(uint32_t now) {
+    PacketPing pkt;
+    pkt.type = PKT_PING;
+    pkt.timestamp = now;
+
+    net_send(&pkt, sizeof(pkt));
+}
+
+void net_send(void *data, size_t size) {
+    sendto(sock, data, size, 0, (struct sockaddr*)&server_addr, addr_len);
 }
 
 void handle_state_packet(PacketState* pkt) {
@@ -77,6 +93,24 @@ void handle_state_packet(PacketState* pkt) {
             return;
         }
     }
+
+}
+
+int net_update(void) {
+    uint32_t now = SDL_GetTicks();
+
+    if (now - last_ping_sent > 1000) {
+        send_ping(now);
+        last_ping_sent = now;
+    }
+    receive_packets();
+
+    if (SDL_GetTicks() - last_pong_received > 5000) {
+        send_logout();
+        return -1;
+    }
+
+    return 0;
 
 }
 
@@ -118,6 +152,13 @@ void receive_packets() {
                     break;
                 }
             }
+        }else if (hdr->type == PKT_PONG) {
+            PacketPong* pkt = (PacketPong*)buffer;
+
+            uint32_t ping = SDL_GetTicks() - pkt->timestamp;
+            last_pong_received = SDL_GetTicks();
+
+            printf("Ping: %u ms\n", ping);
         }
     }
 }
