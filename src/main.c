@@ -18,7 +18,7 @@ float player_y = 100;
 int main() {
 
     socket_init();
-    initRenderer();
+    initRenderer("Game");
 
     int running = 1;
     SDL_Event e;

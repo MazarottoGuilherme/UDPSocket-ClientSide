@@ -1,23 +1,13 @@
 #include "net.h"
 
-#include <errno.h>
 
-#include "../protocol/protocol.h"
-#include <fcntl.h>
-#include <SDL_timer.h>
-#include <stdio.h>
-#include <string.h>
-#include <arpa/inet.h>
-#include <netinet/in.h>
-#include <sys/socket.h>
-
-
-int porta = 8080;
 
 int porta = 8080;
 int sock;
 struct sockaddr_in server_addr;
 socklen_t addr_len;
+uint32_t last_ping_sent = 0;
+uint32_t last_pong_received = 0;
 
 Player players[MAX_PLAYERS];
 
@@ -47,13 +37,13 @@ int send_login(char *email, char *password) {
     snprintf(msg, sizeof(msg), "LOGIN|01|%s|%s", email, password);
     if (sendto(sock, msg, strlen(msg), 0,(struct sockaddr*)&server_addr, addr_len) < 0) {
         perror("sendto");
-        return; // retorna nada
+        return -1; // retorna nada
     }
     char bufferID[256];
     ssize_t response = recvfrom(sock, bufferID, sizeof(bufferID) - 1, 0,
                          (struct sockaddr*)&server_addr, &addr_len);
     if (response < 0) {perror("recvfrom");
-        return; // retorna nada
+        return -1; // retorna nada
     }
     bufferID[response] = '\0';
     int id_user;
@@ -66,8 +56,9 @@ int send_login(char *email, char *password) {
         return -1;
     }
     Usuario user;
-    user->id = id_user;
-    user->name = username;
+    user.id = id_user;
+    strncpy(user.name, username, sizeof(user.name) - 1);
+    user.name[sizeof(user.name)-1] = '\0';
     close(sock);
     return user_id; // retorna um id
 }

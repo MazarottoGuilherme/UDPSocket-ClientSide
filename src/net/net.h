@@ -2,8 +2,22 @@
 #define UDPSOCKETCLIENT_NET_H
 
 #define MAX_PLAYERS 1024
+
+
 #include <stddef.h>
+#include <unistd.h>
 #include <stdint.h>
+#include <errno.h>
+#include "../protocol/protocol.h"
+#include <fcntl.h>
+#include <SDL_timer.h>
+#include <stdio.h>
+#include <string.h>
+#include <arpa/inet.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
+#include "../game/game_state.h"
+
 
 typedef struct {
     int active;
@@ -14,10 +28,10 @@ typedef struct {
 extern Player players[MAX_PLAYERS];
 
 extern int user_id;
-Usua
+// Usua
 
 void socket_init();
-void send_login(char *email, char *password);
+int send_login(char *email, char *password);
 void send_input(int dx, int dy);
 void receive_packets();
 void send_logout();

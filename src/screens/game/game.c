@@ -23,7 +23,7 @@ Texture* getTextureForTile(int tileId) {
 
 void game_init(void) {
     socket_init();
-    send_login();
+    login_init();
 
     map = load_map(ASSETS_DIR"/data/maps/map.json");
 
