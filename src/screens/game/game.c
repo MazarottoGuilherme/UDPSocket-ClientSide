@@ -9,12 +9,15 @@
 #include "../../render/map_render.h"
 #include "../../animation/animation.h"
 #include "../../config.h"
+#include "./game.h"
 
 Texture* textures;
 Map* map;
 SDL_Texture* playerTexture;
 AnimationSet* playerSet;
 Animation* playerIdle;
+Camera camera;
+Player playerPrincipal;
 
 void game_init(void) {
     socket_init();
@@ -23,6 +26,17 @@ void game_init(void) {
     map = load_map(ASSETS_DIR"/data/maps/map.json");
 
     textures = malloc(sizeof(Texture) * map->tilesetCount);
+
+    for (int i = 0; i < MAX_PLAYERS; i++) {
+        if (!players[i].active)
+            continue;
+        if (players[i].id != user_id) {
+            continue;
+        }
+        playerPrincipal = players[i];
+        playerPrincipal.x = WINDOW_WIDTH/2;
+        playerPrincipal.y = WINDOW_HEIGHT/2;
+    }
 
     for (int i = 0; i < map->tilesetCount; i++) {
         textures[i] = texture_load(map->tilesets[i].image);
@@ -43,12 +57,44 @@ void game_init(void) {
     playerSet = loadAnimations(ASSETS_DIR "/data/animations/player.json");
 
     playerIdle = getAnimation(playerSet, "idle");
-    playerIdle->delay = 100;
+    playerIdle->delay = 120;
+    camera.x = WINDOW_WIDTH ;
+    camera.y = WINDOW_HEIGHT;
+    camera.width = WINDOW_WIDTH;
+    camera.height = WINDOW_HEIGHT;
+
+}
+
+void camera_update() {
+    float playerX, playerY;
+    for (int i = 0; i < MAX_PLAYERS; i++) {
+        if (players[i].id != user_id) {
+            continue;;
+        }
+        playerX = players[i].x;
+        playerY = players[i].y;
+
+    }
+    camera.x = playerX - camera.width / 2;
+    camera.y = playerY - camera.height / 2;
+
+    // opcional: limitar para não sair do mapa
+    if (camera.x < 0) camera.x = 0;
+    if (camera.y < 0) camera.y = 0;
+    if (camera.x > map->width * TILE_SIZE - camera.width)
+        camera.x = map->width * TILE_SIZE - camera.width;
+    if (camera.y > map->height * TILE_SIZE - camera.height)
+        camera.y = map->height * TILE_SIZE - camera.height;
 
 }
 
 void game_handle_event(SDL_Event *e) {
+    if (e->type == SDL_MOUSEBUTTONDOWN) {
+        if (e->button.button == SDL_BUTTON_LEFT) {
 
+
+        }
+    }
 }
 
 void game_update(void) {
@@ -70,23 +116,44 @@ void game_update(void) {
 
 void game_render(void) {
 
-    map_render(map, textures);
 
-
+    camera_update(playerPrincipal.x, playerPrincipal.y);
+    map_render(map, textures, camera);
+    SDL_Color debugColor = {255, 0, 0, 100};
     SDL_Color c;
     for (int i = 0; i < MAX_PLAYERS; i++) {
         if (!players[i].active)
             continue;
-        if (players[i].id != user_id) {
-            continue;
-        }
 
 
+        int SPRITE_SIZE = 32;
+        int scale = 2;
 
         Frame* f = &playerIdle->frames[playerIdle->lastFrame];
-        SDL_Rect srcrect = { f->offset_x + ((playerIdle->lastFrame) * 32 ), f->offset_y, f->width, f->height };
+        SDL_Rect srcrect = { f->offset_x + ((playerIdle->lastFrame) * 32 ), f->offset_y, f->width, f->height }; // só recorta a imagem do spritesheet, aqui nunca deve mexer, aqui nao muda a posicao na tela
 
-        SDL_Rect r = { (int)players[i].x, (int)players[i].y, f->width * 2, f->height * 2 };
+
+        int cx = (int)players[i].x;
+        int cy = (int)players[i].y;
+
+        SDL_Rect debugRect = {
+            cx ,
+            cy ,
+            SPRITE_SIZE * scale,
+            SPRITE_SIZE * scale
+        };
+
+        SDL_Point point = {
+            (debugRect.x)  + (f->offset_x * scale),
+            (debugRect.y) + (f->offset_y* scale)
+        };
+
+        SDL_Rect r = {
+            (int)(players[i].x - camera.x) + f->offset_x * scale,
+            (int)(players[i].y - camera.y) + f->offset_y * scale,
+            f->width * scale,
+            f->height * scale
+        };
 
         SDL_RenderCopy(getRenderer(), playerTexture, &srcrect, &r);
 
@@ -98,7 +165,12 @@ void game_render(void) {
                 playerIdle->lastFrame = 0;
         }
 
-        //
+        if (players[i].id == user_id) {
+            playerPrincipal.x = players[i].x;
+            playerPrincipal.y = players[i].y;
+        }
+
+
         // if (players[i].id == user_id)
         //     c = (SDL_Color){255, 0,0,255};
         // else

@@ -3,8 +3,8 @@
 SDL_Window* window;
 SDL_Renderer* renderer;
 
-int WINDOW_WIDTH = 800;
-int WINDOW_HEIGHT = 600;
+const int WINDOW_WIDTH = 800;
+const int WINDOW_HEIGHT = 600;
 
 void initRenderer(char* title) {
     window = SDL_CreateWindow(title, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, WINDOW_WIDTH, WINDOW_HEIGHT, SDL_WINDOW_SHOWN);

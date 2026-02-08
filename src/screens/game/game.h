@@ -2,6 +2,11 @@
 #define UDPSOCKETCLIENT_GAME_H
 #include <SDL2/SDL.h>
 
+typedef struct {
+    int x, y;
+    int width, height;
+} Camera;
+
 void game_init(void);
 void game_handle_event(SDL_Event *e);
 void game_update(void);
