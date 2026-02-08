@@ -2,7 +2,7 @@
 
 #include <errno.h>
 
-#include "../protocol/protocol.h"
+#include "protocol.h"
 #include <fcntl.h>
 #include <SDL_timer.h>
 #include <stdio.h>

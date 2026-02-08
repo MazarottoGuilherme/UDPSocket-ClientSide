@@ -1,6 +1,6 @@
 #ifndef UDPSOCKETCLIENT_MAP_H
 #define UDPSOCKETCLIENT_MAP_H
-#include <SDL_render.h>
+#include <SDL2/SDL.h>
 #define TILE_SIZE 16
 
 typedef struct {

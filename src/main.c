@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include <stdint.h>
 #include <unistd.h>
 #include <SDL2/SDL.h>
 
@@ -7,7 +6,7 @@
 #include "render/render.h"
 #include "engine/engine.h"
 #include "screens/screen.h"
-#include <unistd.h>
+
 float player_x = 100;
 float player_y = 100;
 

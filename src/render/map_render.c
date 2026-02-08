@@ -1,6 +1,6 @@
 #include "map_render.h"
 #include "tilemap.h"
-#include "../config/config.h"
+#include "../config.h"
 
 Texture* getTextureForTile(Map* map, Texture* textures, int tileId)
 {

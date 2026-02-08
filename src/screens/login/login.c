@@ -1,12 +1,12 @@
 #include "login.h"
 
-#include <SDL_ttf.h>
+#include <SDL2/SDL_ttf.h>
 #include <string.h>
 
 #include "../../game/game_state.h"
 #include "../../render/render_objects.h"
 #include "../screen.h"
-#include "../../config/config.h"
+#include "../../config.h"
 
 static struct {
     char username[64];

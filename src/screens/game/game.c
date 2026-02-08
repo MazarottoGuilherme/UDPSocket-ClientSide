@@ -1,4 +1,6 @@
-#include "game.h"
+
+#include <SDL2/SDL_image.h>
+
 #include "../../net/net.h"
 #include "../screen.h"
 #include "../../map/map.h"
@@ -6,8 +8,7 @@
 #include "../../graphics/texture.h"
 #include "../../render/map_render.h"
 #include "../../animation/animation.h"
-#include "../../config/config.h"
-
+#include "../../config.h"
 
 Texture* textures;
 Map* map;

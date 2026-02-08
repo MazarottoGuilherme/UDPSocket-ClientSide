@@ -14,20 +14,18 @@ add_executable(UDPSocketClient
         src/main.c
         src/net/net.c
         src/render/render.c
-        src/input/input.c
         src/engine/engine.c
         src/engine/engine.h
         src/screens/screen.c
         src/screens/screen.h
         src/screens/login/login.c
         src/screens/login/login.h
-        src/config/Config.h
+        src/config.h
         src/render/render_objects.c
         src/render/render_objects.h
         src/game/game_state.c
         src/game/game_state.h
         src/screens/game/game.c
-        src/screens/game/game.h
         src/render/tilemap.c
         src/render/tilemap.h
         src/map/map.c
@@ -40,8 +38,7 @@ add_executable(UDPSocketClient
         src/animation/animation.h
         src/render/map_render.c
         src/render/map_render.h
-        src/graphics/sprite.c
-        src/graphics/sprite.h
+        src/screens/game/game.h
 )
 
 target_include_directories(UDPSocketClient PRIVATE

@@ -1,8 +1,8 @@
 #include "texture.h"
 
-#include <SDL_image.h>
+#include <SDL2/SDL_image.h>
 #include "../render/render.h"
-#include "../config/config.h"
+#include "../config.h"
 
 Texture texture_load(const char* image)
 {
