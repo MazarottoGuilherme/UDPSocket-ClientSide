@@ -51,6 +51,7 @@ typedef struct {
 typedef struct {
     uint8_t type;
     int player_id;
+    char username[16];
     float x;
     float y;
 } PacketState;

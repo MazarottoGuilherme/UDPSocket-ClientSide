@@ -1,5 +1,13 @@
 #include "animation.h"
 #include <cJSON.h>
+#include <SDL_image.h>
+#include "../render/render.h"
+#include "../config.h"
+
+SDL_Texture* playerTexture = NULL;
+AnimationSet* playerSet = NULL;
+Animation* playerIdleAnimation = NULL;
+
 
 AnimationSet* loadAnimations(const char* path)
 {
@@ -49,7 +57,6 @@ AnimationSet* loadAnimations(const char* path)
     return set;
 }
 
-
 Animation* getAnimation(AnimationSet* set, const char* name)
 {
     for (int i = 0; i < set->animationCount; i++) {
@@ -79,4 +86,48 @@ void animation_set_destroy(AnimationSet* set)
 
     free(set->animations);
     free(set);
+}
+
+AnimationSet* loadAnimationSet(const char* path)
+{
+    char fullpath[256];
+    snprintf(fullpath, sizeof(fullpath), "%s%s", ASSETS_DIR, path);
+
+    return loadAnimations(fullpath);
+}
+
+SDL_Texture* getPlayerTexture(void) {
+    if (!playerTexture) {
+        SDL_Surface* playerSurface = IMG_Load(ASSETS_DIR "/tilesets/player.png");
+        if (!playerSurface) {
+            printf("IMG_Load Error: %s\n", IMG_GetError());
+            return NULL;
+        }
+        playerTexture = SDL_CreateTextureFromSurface(getRenderer(), playerSurface);
+        if (!playerTexture) {
+            printf("SDL_CreateTextureFromSurface Error: %s\n", SDL_GetError());
+            return NULL;
+        }
+        SDL_FreeSurface(playerSurface);
+    }
+
+    return playerTexture;
+
+}
+
+AnimationSet* getPlayerAnimationSet(void) {
+    if (playerSet) return playerSet;
+
+    playerSet = loadAnimationSet("/data/animations/player.json");
+
+    return playerSet;
+}
+
+Animation* getPlayerIdleAnimation(void) {
+    if (playerIdleAnimation) return playerIdleAnimation;
+
+    playerIdleAnimation = getAnimation(getPlayerAnimationSet(), "idle");
+    playerIdleAnimation->delay = 120;
+
+    return playerIdleAnimation;
 }

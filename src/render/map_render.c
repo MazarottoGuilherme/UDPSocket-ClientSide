@@ -1,4 +1,6 @@
 #include "map_render.h"
+
+#include "render.h"
 #include "tilemap.h"
 
 Texture* getTextureForTile(Map* map, Texture* textures, int tileId)
@@ -41,4 +43,33 @@ void map_render(Map* map, Texture* textures, Camera camera)
             }
         }
     }
+}
+
+void renderMapToCache(Map* map, Texture* textures, SDL_Texture* mapCache) {
+    SDL_SetRenderTarget(getRenderer(), mapCache);
+    SDL_SetRenderDrawColor(getRenderer(), 0, 0, 0, 255);
+    SDL_RenderClear(getRenderer());
+
+    for (int l = 0; l < map->layersCount; l++) {
+        if (strcmp(map->layers[l].name, "collision") == 0) {
+            continue;
+        }
+        for (int y = 0; y < map->height; y++) {
+            for (int x = 0; x < map->width; x++) {
+                int tileIndex = y * map->width + x;
+                int tileId = map->layers[l].tiles[tileIndex];
+                if (!tileId) continue;
+
+                Texture* tex = getTextureForTile(map, textures, tileId);
+                if (!tex) continue;
+
+                int localTileId =
+                    tileId - map->tilesets[tex - textures].first_grid + 1;
+
+                drawTile(localTileId, x * TILE_SIZE, y * TILE_SIZE, *tex);
+            }
+        }
+    }
+
+    SDL_SetRenderTarget(getRenderer(), NULL);
 }

@@ -11,13 +11,16 @@
 #include "../../config.h"
 #include "./game.h"
 
+#include "../../render/render_objects.h"
+#include "../../render/players_render.h"
+
 Texture* textures;
 Map* map;
-SDL_Texture* playerTexture;
-AnimationSet* playerSet;
-Animation* playerIdle;
 Camera camera;
-Player playerPrincipal;
+SDL_Texture* mapCache;
+TTF_Font *font;
+Text text;
+int mapChanged = 0;
 
 void game_init(void) {
     socket_init();
@@ -42,33 +45,40 @@ void game_init(void) {
         textures[i] = texture_load(map->tilesets[i].image);
     }
 
-    SDL_Surface* playerSurface = IMG_Load(ASSETS_DIR "/tilesets/player.png");
-    if (!playerSurface) {
-        printf("IMG_Load Error: %s\n", IMG_GetError());
-        exit(1);
-    }
-    playerTexture = SDL_CreateTextureFromSurface(getRenderer(), playerSurface);
-    if (!playerTexture) {
-        printf("SDL_CreateTextureFromSurface Error: %s\n", SDL_GetError());
-        exit(1);
-    }
-    SDL_FreeSurface(playerSurface);
 
-    playerSet = loadAnimations(ASSETS_DIR "/data/animations/player.json");
-
-    playerIdle = getAnimation(playerSet, "idle");
-    playerIdle->delay = 120;
     camera.x = WINDOW_WIDTH ;
     camera.y = WINDOW_HEIGHT;
+
     camera.width = WINDOW_WIDTH;
     camera.height = WINDOW_HEIGHT;
+
+    mapCache = SDL_CreateTexture(
+        getRenderer(),
+        SDL_PIXELFORMAT_RGBA8888,
+        SDL_TEXTUREACCESS_TARGET,
+        map->width * TILE_SIZE,
+        map->height * TILE_SIZE
+        );
+    renderMapToCache(map, textures, mapCache);
+
+    font = TTF_OpenFont(ASSETS_DIR "/DejaVuSans-BoldOblique.ttf", 10);
+    if (!font) {
+        printf("Font error: %s\n", TTF_GetError());
+        exit(1);
+    }
+
+    text = createText(font, "guilherme", (SDL_Color){0,0,0,255});
 
 }
 
 void camera_update() {
+    // WindowSize size = GetWindowSize();
+    // camera.width = size.w;
+    // camera.height = size.h;
+
     float playerX, playerY;
     for (int i = 0; i < MAX_PLAYERS; i++) {
-        if (players[i].id != user_id) {
+        if (players[i].active != 1 || players[i].id != user_id) {
             continue;;
         }
         playerX = players[i].x;
@@ -78,23 +88,15 @@ void camera_update() {
     camera.x = playerX - camera.width / 2;
     camera.y = playerY - camera.height / 2;
 
-    // opcional: limitar para não sair do mapa
     if (camera.x < 0) camera.x = 0;
     if (camera.y < 0) camera.y = 0;
     if (camera.x > map->width * TILE_SIZE - camera.width)
         camera.x = map->width * TILE_SIZE - camera.width;
     if (camera.y > map->height * TILE_SIZE - camera.height)
         camera.y = map->height * TILE_SIZE - camera.height;
-
 }
 
 void game_handle_event(SDL_Event *e) {
-    if (e->type == SDL_MOUSEBUTTONDOWN) {
-        if (e->button.button == SDL_BUTTON_LEFT) {
-
-
-        }
-    }
 }
 
 void game_update(void) {
@@ -110,74 +112,24 @@ void game_update(void) {
         send_input(dx, dy);
 
     if (net_update() <0) {
-        change_screen(SCREEN_LOGIN);
+         change_screen(SCREEN_LOGIN);
     }
 }
 
 void game_render(void) {
-
-
     camera_update(playerPrincipal.x, playerPrincipal.y);
-    map_render(map, textures, camera);
-    SDL_Color debugColor = {255, 0, 0, 100};
-    SDL_Color c;
-    for (int i = 0; i < MAX_PLAYERS; i++) {
-        if (!players[i].active)
-            continue;
+    // map_render(map, textures, camera);
 
-
-        int SPRITE_SIZE = 32;
-        int scale = 2;
-
-        Frame* f = &playerIdle->frames[playerIdle->lastFrame];
-        SDL_Rect srcrect = { f->offset_x + ((playerIdle->lastFrame) * 32 ), f->offset_y, f->width, f->height }; // só recorta a imagem do spritesheet, aqui nunca deve mexer, aqui nao muda a posicao na tela
-
-
-        int cx = (int)players[i].x;
-        int cy = (int)players[i].y;
-
-        SDL_Rect debugRect = {
-            cx ,
-            cy ,
-            SPRITE_SIZE * scale,
-            SPRITE_SIZE * scale
-        };
-
-        SDL_Point point = {
-            (debugRect.x)  + (f->offset_x * scale),
-            (debugRect.y) + (f->offset_y* scale)
-        };
-
-        SDL_Rect r = {
-            (int)(players[i].x - camera.x) + f->offset_x * scale,
-            (int)(players[i].y - camera.y) + f->offset_y * scale,
-            f->width * scale,
-            f->height * scale
-        };
-
-        SDL_RenderCopy(getRenderer(), playerTexture, &srcrect, &r);
-
-        Uint32 now = SDL_GetTicks();
-        if (now - playerIdle->lastTick > playerIdle->delay) {
-            playerIdle->lastFrame++;
-            playerIdle->lastTick = now;
-            if (playerIdle->lastFrame == playerIdle->frameCount)
-                playerIdle->lastFrame = 0;
-        }
-
-        if (players[i].id == user_id) {
-            playerPrincipal.x = players[i].x;
-            playerPrincipal.y = players[i].y;
-        }
-
-
-        // if (players[i].id == user_id)
-        //     c = (SDL_Color){255, 0,0,255};
-        // else
-        //     c = (SDL_Color){0,0,255,255};
-
-        // fill_rect(&r, c);
+    if (mapChanged) {
+        renderMapToCache(map, textures, mapCache);
+        mapChanged = 0;
     }
+
+    SDL_Rect src = { camera.x, camera.y, camera.width, camera.height };
+    SDL_Rect dst = { 0, 0, camera.width, camera.height };
+    SDL_RenderCopy(getRenderer(), mapCache, &src, &dst);
+
+    render_players(camera.x, camera.y, font);
 }
 
 void game_shutdown(void) {
@@ -186,9 +138,9 @@ void game_shutdown(void) {
 
     free(textures);
 
-    SDL_DestroyTexture(playerTexture);
+    SDL_DestroyTexture(getPlayerTexture());
 
-    animation_set_destroy(playerSet);
+    animation_set_destroy(getPlayerAnimationSet());
     map_destroy(map);
 
     send_logout();

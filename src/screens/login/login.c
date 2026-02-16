@@ -9,7 +9,7 @@
 #include "../../config.h"
 
 static struct {
-    char username[64];
+    char username[16];
     TTF_Font *font;
     int finished;
 } login;

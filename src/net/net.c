@@ -11,6 +11,8 @@
 #include <netinet/in.h>
 #include <sys/socket.h>
 
+#include "../game/game_state.h"
+
 int sock;
 struct sockaddr_in server_addr;
 socklen_t addr_len;
@@ -40,7 +42,8 @@ void send_login() {
     memset(&pkt, 0, sizeof(pkt));
 
     pkt.type = PKT_LOGIN;
-    strncpy(pkt.username, "guilherme", 15);
+
+    strncpy(pkt.username, get_username(), (sizeof(get_username()) + 1));
 
     net_send(&pkt, sizeof(pkt));
 }
@@ -90,6 +93,7 @@ void handle_state_packet(PacketState* pkt) {
             players[i].id = pkt->player_id;
             players[i].x = pkt->x;
             players[i].y = pkt->y;
+            strcpy(players[i].name, pkt->username);
             return;
         }
     }

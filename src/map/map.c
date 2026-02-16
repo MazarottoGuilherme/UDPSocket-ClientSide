@@ -7,7 +7,8 @@
 
 TilesetMapEntry tilesetMap[] = {
     {"../tiled/water.tsx", "/tilesets/water.png"},
-    {"../tiled/hills.tsx", "/tilesets/hills.png"}
+    {"../tiled/hills.tsx", "/tilesets/hills.png"},
+    {"collision.tsx", "/tilesets/hills.png"}
 };
 
 const char* getMappedTileset(const char* source) {
@@ -55,6 +56,11 @@ Map* load_map(const char* path)
     for (int i = 0; i < layersSizeCount; i++) {
         cJSON* layer = cJSON_GetArrayItem(layers, i);
         cJSON* data = cJSON_GetObjectItem(layer, "data");
+        cJSON* layerName = cJSON_GetObjectItem(layer, "name");
+
+        map->layers[i].name = malloc(sizeof(char) * strlen(layerName->valuestring) + 1);
+        strcpy(map->layers[i].name, layerName->valuestring);
+
         int count = cJSON_GetArraySize(data);
 
         map->layers[i].tiles = malloc(sizeof(int) * count);

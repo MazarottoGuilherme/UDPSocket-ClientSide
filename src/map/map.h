@@ -11,6 +11,7 @@ typedef struct {
 typedef struct {
     int id;
     int* tiles;
+    char* name;
 }Layer;
 
 typedef struct {

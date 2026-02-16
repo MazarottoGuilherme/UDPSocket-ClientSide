@@ -15,4 +15,8 @@ void drawTile(int tileId, int pixelX, int pixelY, Texture texture)
     SDL_Rect dest = { pixelX, pixelY, TILE_SIZE, TILE_SIZE };
 
     SDL_RenderCopy(getRenderer(), texture.texture, &src, &dest);
+    //
+    // SDL_SetRenderDrawColor(getRenderer(), 255, 0, 0, 255);
+    // SDL_RenderDrawRect(getRenderer(), &dest);
+
 }

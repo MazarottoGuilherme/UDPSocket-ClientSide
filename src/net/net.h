@@ -7,8 +7,9 @@
 
 typedef struct {
     int active;
+    char name[16];
     int id;
-    float x, y;
+    int x, y;
 }Player;
 
 extern Player players[MAX_PLAYERS];

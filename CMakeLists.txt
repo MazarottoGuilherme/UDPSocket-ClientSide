@@ -39,6 +39,8 @@ add_executable(UDPSocketClient
         src/render/map_render.c
         src/render/map_render.h
         src/screens/game/game.h
+        src/render/players_render.c
+        src/render/players_render.h
 )
 
 target_include_directories(UDPSocketClient PRIVATE
